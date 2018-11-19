@@ -28,6 +28,50 @@
 
 
     <script>
+        var styles = {
+            'crag': [new ol.style.Style({
+              image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
+                  anchor: [0.5, 1],
+                  width: 6,
+                  src: './res/img/ic_poi_crag.svg'
+                }))
+            })],
+            'gym': [new ol.style.Style({
+              image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
+                  anchor: [0.5, 1],
+                  width: 6,
+                  src: './res/img/ic_poi_gym.svg'
+                }))
+            })],
+            'route': [new ol.style.Style({
+              image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
+                  anchor: [0.5, 1],
+                  width: 6,
+                  color: '#00ff00',
+                  src: './res/img/ic_route.svg'
+                }))
+            })],
+            'undefined': [new ol.style.Style({
+              image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
+                  anchor: [0.5, 1],
+                  width: 6,
+                  src: './res/img/ic_route.svg'
+                }))
+            })]
+        };
+
+      var styleFunction = function (feature, resolution) {
+          if (feature.get('climbing') === 'crag') {
+            return styles['crag'];
+          } else if(feature.get('leisure') === 'sports_centre' || feature.get('tower:type') === 'climbing') {
+            return styles['gym'];
+          } else if ((feature.get('climbing') === 'route_bottom' || feature.get('climbing') === 'route_top')) {
+            return styles['route'];
+          } else {
+            return styles['undefined'];
+          }
+      };
+
       var map = new ol.Map({
         layers: [
           new ol.layer.Tile({
@@ -77,14 +121,7 @@
       var vectorLayer = new ol.layer.Vector({
         renderMode: 'image',
         source: vectorSource,
-        style: (new ol.style.Style({
-              image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
-                anchor: [0.5, 1],
-                width: 6,
-                color: '#ffff00',
-                src: './res/img/ic_route.svg'
-              }))
-        }))
+        style: styleFunction
       })
       map.addLayer(vectorLayer);
     </script>
