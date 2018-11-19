@@ -131,8 +131,6 @@
               grade = feature.get('climbing:grade:uiaa');
             }
 
-            console.log(uiaaGrades.indexOf(grade));
-
             if (!styles['route'+grade]) {
               styles['route'+grade] =[new ol.style.Style({
                   image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
@@ -180,7 +178,7 @@
           zoom: 13
         })
       });
-      // If you want dynamic version
+
       var vectorSource = new ol.source.Vector({
         format: new ol.format.GeoJSON(),
         loader: function(extent, resolution, projection) {
@@ -191,8 +189,7 @@
               ol.proj.transformExtent(extent, projection, 'EPSG:4326');
           var stringExtent = epsg4326Extent[1] + ',' + epsg4326Extent[0] + ',' +
               epsg4326Extent[3] + ',' + epsg4326Extent[2];
-          // Usefull if you use an ol.loadingstrategy.bbox instead of  ol.loadingstrategy.all
-          //var query = '[out:json][timeout:25];(node["amenity"="cafe"](' + stringExtent + ');way["amenity"="cafe"](' + stringExtent + ');relation["amenity"="cafe"](' + stringExtent + '););out;>;out skel qt;';
+
           var query = '[bbox:'+ stringExtent + '][out:json][timeout:60];(node["sport"="climbing"];);out center;>;'
           fetch('https://overpass.kumi.systems/api/interpreter', {
             method: "POST",
@@ -220,7 +217,6 @@
       })
       map.addLayer(vectorLayer);
 
-      // Popup showing the position the user clicked
       var popup = new ol.Overlay({
         element: document.getElementById('popup'),
         positioning: 'bottom-center',
