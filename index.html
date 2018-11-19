@@ -36,8 +36,8 @@
         ],
         target: 'map',
         view: new ol.View({
-          center: ol.proj.fromLonLat([6.17383, 48.69662]),
-          zoom: 13
+          center: ol.proj.fromLonLat([-73.554, 45.5088]),
+          zoom: 10
         })
       });
       // If you want dynamic version
@@ -63,14 +63,6 @@
             var features = new ol.format.GeoJSON().readFeatures(geojson, {
               featureProjection: map.getView().getProjection()
             });
-            // features.forEach(setStyle(new ol.style.Style({
-            //   image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
-            //     anchor: [0.5, 1],
-            //     width: 6,
-            //     color: '#ffff00',
-            //     src: './res/img/ic_route.svg'
-            //   }))
-            // })));
             vectorSource.addFeatures(features);
           });
         },
@@ -80,7 +72,15 @@
 
       var vectorLayer = new ol.layer.Vector({
         renderMode: 'image',
-        source: vectorSource
+        source: vectorSource,
+        style: (new ol.style.Style({
+              image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
+                anchor: [0.5, 1],
+                width: 6,
+                color: '#ffff00',
+                src: './res/img/ic_route.svg'
+              }))
+        }))
       })
       map.addLayer(vectorLayer);
     </script>
