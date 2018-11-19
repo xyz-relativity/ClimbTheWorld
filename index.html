@@ -44,13 +44,17 @@
       var vectorSource = new ol.source.Vector({
         format: new ol.format.GeoJSON(),
         loader: function(extent, resolution, projection) {
+          if (resolution > 400) {
+            return;
+          }
+          console.log(resolution);
           var epsg4326Extent =
               ol.proj.transformExtent(extent, projection, 'EPSG:4326');
           var stringExtent = epsg4326Extent[1] + ',' + epsg4326Extent[0] + ',' +
               epsg4326Extent[3] + ',' + epsg4326Extent[2];
           // Usefull if you use an ol.loadingstrategy.bbox instead of  ol.loadingstrategy.all
           //var query = '[out:json][timeout:25];(node["amenity"="cafe"](' + stringExtent + ');way["amenity"="cafe"](' + stringExtent + ');relation["amenity"="cafe"](' + stringExtent + '););out;>;out skel qt;';
-          var query = '[bbox:'+ stringExtent + '][out:json][timeout:25];(node["sport"="climbing"];);out center;>;'
+          var query = '[bbox:'+ stringExtent + '][out:json][timeout:60];(node["sport"="climbing"];);out center;>;'
           fetch('https://overpass.kumi.systems/api/interpreter', {
             method: "POST",
             body: query
