@@ -36,64 +36,136 @@
 
 
     <script>
-        var styles = {
-            'crag': [new ol.style.Style({
-              image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
-                  anchor: [0.5, 1],
-                  width: 6,
-                  color: '#ffffffaa',
-                  src: './res/img/ic_poi_crag.svg'
-                }))
-            })],
-            'gym': [new ol.style.Style({
-              image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
-                  anchor: [0.5, 1],
-                  width: 6,
-                  color: '#ffffffaa',
-                  src: './res/img/ic_poi_gym.svg'
-                }))
-            })],
-            'route': [new ol.style.Style({
-              image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
-                  anchor: [0.5, 1],
-                  width: 6,
-                  color: '#00ff00aa',
-                  src: './res/img/ic_route.svg'
-                }))
-            })],
-            'undefined': [new ol.style.Style({
-              image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
-                  anchor: [0.5, 1],
-                  width: 6,
-                  color: '#ffffffaa',
-                  src: './res/img/ic_route.svg'
-                }))
-            })]
-        };
+      var uiaaGrades = ["1-","1","1+","2-","2","2+","3-","3","3+","4-","4","4+","5-","5","5+","6-","6","6+","7-","7","7+","8-","8","8+","9-","9","9+","10-","10","10+","11-","11","11+","12+","12","12+","13-","13","13+","14-"];
+      var styles = {
+          'crag': [new ol.style.Style({
+            image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
+                anchor: [0.5, 1],
+                width: 6,
+                color: '#ffffffaa',
+                src: './res/img/ic_poi_crag.svg'
+              }))
+          })],
+          'gym': [new ol.style.Style({
+            image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
+                anchor: [0.5, 1],
+                width: 6,
+                color: '#ffffffaa',
+                src: './res/img/ic_poi_gym.svg'
+              }))
+          })],
+          'route?': [new ol.style.Style({
+            image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
+                anchor: [0.5, 1],
+                width: 6,
+                color: '#00ff00aa',
+                src: './res/img/ic_route.svg'
+              }))
+          })],
+          'undefined': [new ol.style.Style({
+            image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
+                anchor: [0.5, 1],
+                width: 6,
+                color: '#ffffffaa',
+                src: './res/img/ic_route.svg'
+              }))
+          })]
+      };
+
+      function remapScale(orgMin, orgMax, newMin, newMax, pos) {
+        var result = newMax;
+
+        var oldRange = (orgMax - orgMin);
+        if (oldRange != 0)
+        {
+            result = ((pos - orgMin) * (newMax - newMin) / oldRange) + newMin;
+        }
+
+        return result;
+      }
+
+      function mix(a, b, v)
+      {
+          return (1-v)*a + v*b;
+      }
+
+      function HSVtoRGB(H, S, V)
+      {
+          var V2 = V * (1 - S);
+          var r  = ((H>=0 && H<=60) || (H>=300 && H<=360)) ? V : ((H>=120 && H<=240) ? V2 : ((H>=60 && H<=120) ? mix(V,V2,(H-60)/60) : ((H>=240 && H<=300) ? mix(V2,V,(H-240)/60) : 0)));
+          var g  = (H>=60 && H<=180) ? V : ((H>=240 && H<=360) ? V2 : ((H>=0 && H<=60) ? mix(V2,V,H/60) : ((H>=180 && H<=240) ? mix(V,V2,(H-180)/60) : 0)));
+          var b  = (H>=0 && H<=120) ? V2 : ((H>=180 && H<=300) ? V : ((H>=120 && H<=180) ? mix(V2,V,(H-120)/60) : ((H>=300 && H<=360) ? mix(V,V2,(H-300)/60) : 0)));
+
+          return {
+              r : Math.round(r * 255),
+              g : Math.round(g * 255),
+              b : Math.round(b * 255)
+          };
+      }
+
+      function rgbToHex(color) {
+        return "#" + ((1 << 24) + (color.r << 16) + (color.g << 8) + color.b).toString(16).slice(1);
+      }
+
+      function getFeatureType(feature) {
+        if (feature.get('climbing') === 'crag') {
+          return 'crag';
+        } else if(feature.get('leisure') === 'sports_centre' || feature.get('tower:type') === 'climbing') {
+          return 'gym';
+        } else if ((feature.get('climbing') === 'route_bottom' || feature.get('climbing') === 'route_top')) {
+          return 'route';
+        } else {
+          return 'undefined';
+        }
+      }
 
       var styleFunction = function (feature, resolution) {
-          if (feature.get('climbing') === 'crag') {
+          var featureType = getFeatureType(feature);
+          if (featureType === 'crag') {
             return styles['crag'];
-          } else if(feature.get('leisure') === 'sports_centre' || feature.get('tower:type') === 'climbing') {
+          } else if(featureType === 'gym') {
             return styles['gym'];
-          } else if ((feature.get('climbing') === 'route_bottom' || feature.get('climbing') === 'route_top')) {
-            return styles['route'];
+          } else if (featureType === 'route') {
+            var grade = '?';
+            if (feature.get('climbing:grade:uiaa')) {
+              grade = feature.get('climbing:grade:uiaa');
+            }
+
+            console.log(uiaaGrades.indexOf(grade));
+
+            if (!styles['route'+grade]) {
+              styles['route'+grade] =[new ol.style.Style({
+                  image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
+                      anchor: [0.5, 1],
+                      width: 6,
+                      color: rgbToHex(HSVtoRGB(remapScale(0, uiaaGrades.length-1, 1, 0, uiaaGrades.indexOf(grade))*120, 1, 1)),
+                      src: './res/img/ic_route.svg'
+                    }))
+                })]
+            }
+
+            return styles['route'+grade];
           } else {
             return styles['undefined'];
           }
       };
 
       var contentFunction = function (feature) {
-        var result ="";
+        var featureType = getFeatureType(feature);
+        var resultContent ="";
+        var resultTitle = feature.get('name') + ' [' + featureType + ']';
         if (feature.get('climbing:grade:uiaa')) {
-          result = result + '<b>Uiaa grade:</b> ' + feature.get('climbing:grade:uiaa');
+          resultContent = resultContent + '<b>Uiaa grade:</b> ' + feature.get('climbing:grade:uiaa');
         }
         if (feature.get('contact:website')) {
-          result = result + '\n<b>Contact website:</b> <a target="blank" href="' + feature.get('contact:website') + '">' + feature.get('contact:website') +'</a>';
+          resultContent = resultContent + '\n<b>Contact website:</b> <a target="blank" href="' + feature.get('contact:website') + '">' + feature.get('contact:website') +'</a>';
         } else if (feature.get('website')) {
-          result = result + '\n<b>Website:</b> <a target="blank" href="' + feature.get('website') + '">' + feature.get('website') +'</a>'
+          resultContent = resultContent + '\n<b>Website:</b> <a target="blank" href="' + feature.get('website') + '">' + feature.get('website') +'</a>'
         }
-        return result;
+        return {
+          title: resultTitle,
+          content: resultContent
+        };
       };
 
       var map = new ol.Map({
@@ -164,6 +236,7 @@
               return feature;
             });
         if (feature) {
+          var contentData = contentFunction(feature)
           var coordinates = feature.getGeometry().getCoordinates();
           element = popup.getElement();
 
@@ -173,10 +246,8 @@
             animation: false,
             placement: 'top',
             html: true,
-            title: feature.get('name'),
-            content: function() {
-              return contentFunction(feature);
-            }
+            title: contentData.title,
+            content: contentData.content
           });
           $(element).popover('show');
         } else {
