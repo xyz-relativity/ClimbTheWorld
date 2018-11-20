@@ -178,11 +178,17 @@
           zoom: 13
         })
       });
+      
+      map.getView().on('change:resolution', function(evt){
+        if (map.getView().getZoom() < 7) {
+          vectorSource.clear();
+        }
+      });
 
       var vectorSource = new ol.source.Vector({
         format: new ol.format.GeoJSON(),
         loader: function(extent, resolution, projection) {
-          if (resolution > 400) {
+          if (map.getView().getZoom() < 7) {
             return;
           }
           var epsg4326Extent =
