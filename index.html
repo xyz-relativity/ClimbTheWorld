@@ -28,16 +28,42 @@
         min-width: 20ch ! important;
         max-width: 100%;
       }
+
+      #zoomWorning {
+        position:fixed;
+        top: 50%;
+        left: 50%;
+        width:16em;
+        height:2em;
+        margin-top: 0em; /*set to a negative number 1/2 of your height*/
+        margin-left: -8em; /*set to a negative number 1/2 of your width*/
+        display: table-cell;
+        border: 1px solid #ccc;
+        background-color: #f3f3f3;
+      }
+      P { 
+        text-align: center;
+        vertical-align: middle;
+        }
       </style>
   </head>
   <body>
     <div id="fullscreen" class="fullscreen">
-        <div id="map" class="map"><div id="popup" class="popup"></div>
+        <div id="map" class="map">
+          <div id="popup" class="popup"></div>
+          
+        </div>
+        <div id="zoomWorning"><p>Zoom in to view data.</p></div>
     </div>
 
 
     <script>
+      var MAX_ZOOM_LEVEL = 9;
       var uiaaGrades = ["1-","1","1+","2-","2","2+","3-","3","3+","4-","4","4+","5-","5","5+","6-","6","6+","7-","7","7+","8-","8","8+","9-","9","9+","10-","10","10+","11-","11","11+","12+","12","12+","13-","13","13+","14-"];
+
+      var zoomDialog = document.getElementById('zoomWorning');
+      zoomDialog.style.display = 'none';
+
       var styles = {
           'crag': [new ol.style.Style({
             image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
@@ -182,15 +208,22 @@
       });
       
       map.getView().on('change:resolution', function(evt){
-        if (map.getView().getZoom() < 7) {
+        if (map.getView().getZoom() < MAX_ZOOM_LEVEL) {
           vectorSource.clear();
+          zoomDialog.style.display = 'block';
+        } else {
+          zoomDialog.style.display = 'none';
+        }
+
+        if (element) {
+          $(element).popover('destroy');
         }
       });
 
       var vectorSource = new ol.source.Vector({
         format: new ol.format.GeoJSON(),
         loader: function(extent, resolution, projection) {
-          if (map.getView().getZoom() < 7) {
+          if (map.getView().getZoom() < MAX_ZOOM_LEVEL) {
             return;
           }
           var epsg4326Extent =
@@ -211,7 +244,9 @@
             var features = new ol.format.GeoJSON().readFeatures(geojson, {
               featureProjection: map.getView().getProjection()
             });
-            vectorSource.addFeatures(features);
+            if (map.getView().getZoom() >= MAX_ZOOM_LEVEL) {
+              vectorSource.addFeatures(features);
+            }
           });
         },
         strategy: ol.loadingstrategy.bbox
@@ -262,7 +297,9 @@
 
       map.on('pointermove', function(evt) {
         if (evt.dragging) {
-          $(element).popover('destroy');
+          if (element) {
+            $(element).popover('destroy');
+          }
           return;
         }
         map.getTargetElement().style.cursor =
