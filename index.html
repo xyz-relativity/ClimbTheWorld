@@ -165,7 +165,14 @@
                       width: 6,
                       color: rgbToHex(HSVtoRGB(remapScale(0, uiaaGrades.length-1, 1, 0, uiaaGrades.indexOf(grade))*120, 1, 1)),
                       src: './res/img/ic_route.svg'
-                    }))
+                    })),
+                    text: new ol.style.Text({
+                      text: grade,
+                      offsetY: -30,
+                      fill: new ol.style.Fill({
+                        color: '#000'
+                      })
+                    })
                 })]
             }
 
