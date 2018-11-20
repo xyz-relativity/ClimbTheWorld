@@ -25,7 +25,8 @@
 
       .popover
       {
-        min-width: 200px ! important;
+        min-width: 20ch ! important;
+        max-width: 100%;
       }
       </style>
   </head>
@@ -153,13 +154,14 @@
         var resultContent ="";
         var resultTitle = feature.get('name') + ' [' + featureType + ']';
         if (feature.get('climbing:grade:uiaa')) {
-          resultContent = resultContent + '<b>Uiaa grade:</b> ' + feature.get('climbing:grade:uiaa');
+          resultContent = resultContent + '<b>Uiaa grade:</b> ' + feature.get('climbing:grade:uiaa') + '<br/>';
         }
         if (feature.get('contact:website')) {
-          resultContent = resultContent + '\n<b>Contact website:</b> <a target="blank" href="' + feature.get('contact:website') + '">' + feature.get('contact:website') +'</a>';
+          resultContent = resultContent + '<b>Contact website:</b> <a target="blank" href="' + feature.get('contact:website') + '">' + feature.get('contact:website') +'</a><br/>';
         } else if (feature.get('website')) {
-          resultContent = resultContent + '\n<b>Website:</b> <a target="blank" href="' + feature.get('website') + '">' + feature.get('website') +'</a>'
+          resultContent = resultContent + '<b>Website:</b> <a target="blank" href="' + feature.get('website') + '">' + feature.get('website') +'</a><br/>'
         }
+        resultContent = resultContent + '<b>Open in OSM:</b> <a target="blank" href="https://www.openstreetmap.org/' + feature.get('id') + '">' + feature.get('id') +'</a><br/>'
         return {
           title: resultTitle,
           content: resultContent
@@ -248,6 +250,7 @@
             animation: false,
             placement: 'top',
             html: true,
+            container: 'body',
             title: contentData.title,
             content: contentData.content
           });
