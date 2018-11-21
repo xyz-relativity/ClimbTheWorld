@@ -326,7 +326,7 @@
           if (feature.get('features').length == 1) {
             contentData = contentFunction(feature.get('features')[0]);
           } else {
-            return;
+            $(element).popover('destroy');
           }
           var coordinates = feature.getGeometry().getCoordinates();
           element = popup.getElement();
