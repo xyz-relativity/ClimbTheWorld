@@ -32,21 +32,14 @@
 
       #zoomWorning {
         position:fixed;
+        width: 50%;
         top: 50%;
-        left: 50%;
-        margin-top: 0em; /*set to a negative number 1/2 of your height*/
-        margin-left: -8em; /*set to a negative number 1/2 of your width*/
-        display: table-cell;
-        border: 1px solid #ccc;
-        background-color: #f3f3f3;
       }
 
       #floating {
         position:fixed;
+        width: 100%;
         top: 0%;
-        left: 50%;
-        margin-top: 0em; /*set to a negative number 1/2 of your height*/
-        margin-left: -8em; /*set to a negative number 1/2 of your width*/
       }
 
       P { 
@@ -60,13 +53,19 @@
         <div id="map" class="map">
           <div id="popup" class="popup"></div>
         </div>
-        <div id="floating" class="btn-group">
+        <div id="floating" class="text-center"> 
+          <div class="btn-group">
             <img src="./res/img/logo.png" class="media-object" style="width:40px">
             <a href="https://play.google.com/store/apps/details?id=com.climbtheworld.app" target="_blank" type="button" class="btn btn-primary">Get "Climb The World" for Android</a>
           </div> 
-        <div id="zoomWorning" class="alert alert-info">
-            <strong>Info!</strong> Zoom in to view data.
+        </div>
+        <div id="zoomWorning" class="text-center">
+          <div class="container">
+            <div class="alert alert-warning">
+              <strong>Info!</strong> Zoom in to view data.
+            </div>
           </div>
+        </div>
     </div>
 
 
