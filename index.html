@@ -30,22 +30,17 @@
         max-width: 100%;
       }
 
-      #zoomWorning {
+      .floatingMiddle {
         position:fixed;
         width: 100%;
         top: 50%;
       }
 
-      #floating {
+      .floatingTop {
         position:fixed;
         width: 100%;
         top: 0%;
       }
-
-      P { 
-        text-align: center;
-        vertical-align: middle;
-        }
       </style>
   </head>
   <body>
@@ -53,14 +48,14 @@
         <div id="map" class="map">
           <div id="popup" class="popup"></div>
         </div>
-        <div id="floating" class="text-center"> 
+        <div class="floatingTop text-center"> 
           <div class="btn-group">
             <img src="./res/img/logo.png" class="media-object" style="width:40px">
             <a href="https://play.google.com/store/apps/details?id=com.climbtheworld.app" target="_blank" type="button" class="btn btn-primary">Get "Climb The World" for Android</a>
           </div> 
         </div>
-        <div id="zoomWorning" class="text-center">
-          <div class="container">
+        <div id="zoomWorning" class="floatingMiddle">
+          <div style="max-width: 27em;" class="container-fluid text-center">
             <div class="alert alert-warning">
               <strong>Info!</strong> Zoom in to view data.
             </div>
