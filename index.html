@@ -71,12 +71,12 @@
 
       var zoomDialog = document.getElementById('zoomWorning');
       zoomDialog.style.display = 'none';
-      var zoom = 13;
+      var zoomLevel = 13;
       var coordinates = ol.proj.fromLonLat([-73.554, 45.5088]);
 
       if(window.location.hash) {
         var str = window.location.hash.substr(5).split("/");
-        zoom = str[0];
+        zoomLevel = str[0];
         coordinates = ol.proj.fromLonLat([parseFloat(str[1]), parseFloat(str[2])]);
         console.log(str[2], str[1]);
       }
@@ -230,7 +230,7 @@
         target: 'map',
         view: new ol.View({
           center: coordinates,
-          zoom: zoom
+          zoom: zoomLevel
         })
       });
       
