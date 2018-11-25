@@ -66,11 +66,20 @@
 
 
     <script>
-      var MAX_ZOOM_LEVEL = 9;
+      var MAX_ZOOM_LEVEL = 10;
       var uiaaGrades = ["1-","1","1+","2-","2","2+","3-","3","3+","4-","4","4+","5-","5","5+","6-","6","6+","7-","7","7+","8-","8","8+","9-","9","9+","10-","10","10+","11-","11","11+","12+","12","12+","13-","13","13+","14-"];
 
       var zoomDialog = document.getElementById('zoomWorning');
       zoomDialog.style.display = 'none';
+      var zoom = 13;
+      var coordinates = ol.proj.fromLonLat([-73.554, 45.5088]);
+
+      if(window.location.hash) {
+        var str = window.location.hash.substr(5).split("/");
+        zoom = str[0];
+        coordinates = ol.proj.fromLonLat([parseFloat(str[1]), parseFloat(str[2])]);
+        console.log(str[2], str[1]);
+      }
 
       var styles = {
           'crag': [new ol.style.Style({
@@ -217,8 +226,8 @@
         ],
         target: 'map',
         view: new ol.View({
-          center: ol.proj.fromLonLat([-73.554, 45.5088]),
-          zoom: 13
+          center: coordinates,
+          zoom: zoom
         })
       });
       
@@ -365,6 +374,11 @@
         }
         map.getTargetElement().style.cursor =
             map.hasFeatureAtPixel(evt.pixel) ? 'pointer' : '';
+      });
+
+      map.on('moveend', function(evt) {
+        var coord = ol.proj.toLonLat(map.getView().getCenter());
+        window.history.replaceState("", "Climb The World Online", "#map="+map.getView().getZoom() + "/" + coord[0] + "/" + coord[1]);
       });
 
     </script>
