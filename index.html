@@ -196,10 +196,10 @@
       var map = new ol.Map({
         layers: [
           new ol.layer.Tile({
-            source: new ol.source.OSM()
-            // source: new ol.source.XYZ({
-            //   url: 'https://{a-c}.tile.opentopomap.org/{z}/{x}/{y}.png'
-            // })
+            // source: new ol.source.OSM()
+            source: new ol.source.XYZ({
+              url: 'https://{a-c}.tile.opentopomap.org/{z}/{x}/{y}.png'
+            })
           })
         ],
         target: 'map',
