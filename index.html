@@ -168,7 +168,7 @@
       var contentFunction = function (feature) {
         var featureType = getFeatureType(feature);
         var resultContent ="";
-        var resultTitle = feature.get('name') + ' [' + featureType + ']';
+        var resultTitle = feature.get('name') + ' [' + featureType + '] ' + '<a target="_blank" href="https://www.openstreetmap.org/' + feature.get('id') + '">OSM link.</a>';
         if (feature.get('climbing:grade:uiaa')) {
           resultContent = resultContent + '<b>Uiaa grade:</b> ' + feature.get('climbing:grade:uiaa') + '<br/>';
         }
@@ -177,7 +177,7 @@
         } else if (feature.get('website')) {
           resultContent = resultContent + '<b>Website:</b> <a target="blank" href="' + feature.get('website') + '">' + feature.get('website') +'</a><br/>'
         }
-        resultContent = resultContent + '<b>Open in OSM:</b> <a target="_blank" href="https://www.openstreetmap.org/' + feature.get('id') + '">' + feature.get('id') +'</a><br/>'
+
         return {
           title: resultTitle,
           content: resultContent
