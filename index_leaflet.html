@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Climb The World Online</title>
+    <meta charset="utf-8"/>
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0"/>
+    
+    <!-- leaflet map library -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.4/dist/leaflet.css"
+    integrity="sha512-puBpdR0798OZvTTbP4A8Ix/l+A4dHDD0DGqYW6RQ+9jxkRFclaxxQb/SJAWZfWAkuyeQUytO7+7N4QKrDh+drA=="
+    crossorigin=""/>  
+    <script src="https://unpkg.com/leaflet@1.3.4/dist/leaflet.js"
+    integrity="sha512-nMMmRyTVoLYqjP9hrbed9S+FzjZHW5gY1TWCHA5ckwXZBadntCNs8kEqAWdrb9O7rxbCaA4lKTIWjDXZxflOcA=="
+    crossorigin=""></script>
+    <!-- plugins -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css"/>
+    <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
+    
+    <!-- Bootstrap imports -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+
+    <script src="./res/js/utils.js"></script>
+
+    <style>
+      html, body, .fullscreen, .map {
+        position: relative;
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+      }
+
+      .floatingMiddle {
+        position:fixed;
+        width: 100%;
+        top: 50%;
+      }
+
+      .floatingTop {
+        position:fixed;
+        width: 100%;
+        top: 0%;
+      }
+      </style>
+  </head>
+  <body>
+    <div id="fullscreen" class="fullscreen">
+        <div id="map" class="map"></div>
+        <div class="floatingTop container-fluid text-center"> 
+          <div class="btn-group">
+            <img src="./res/img/logo.png" class="media-object" style="width:40px;height:40px">
+            <a href="https://play.google.com/store/apps/details?id=com.climbtheworld.app" target="_blank" type="button" class="btn btn-primary">Get "Climb The World" for Android</a>
+          </div> 
+        </div>
+        <div id="zoomWorning" class="floatingMiddle">
+          <div style="max-width: 27em;" class="container-fluid text-center">
+            <div class="alert alert-warning">
+              <strong>Info!</strong> Zoom in to view data.
+            </div>
+          </div>
+        </div>
+    </div>
+
+
+    <script>
+      var MAX_ZOOM_LEVEL = 10;
+      var uiaaGrades = ["1-","1","1+","2-","2","2+","3-","3","3+","4-","4","4+","5-","5","5+","6-","6","6+","7-","7","7+","8-","8","8+","9-","9","9+","10-","10","10+","11-","11","11+","12+","12","12+","13-","13","13+","14-"];
+
+      var climbingMap = {};
+
+      var zoomDialog = document.getElementById('zoomWorning');
+      zoomDialog.style.display = 'none';
+      var zoomLevel = 13;
+      var coordinates = [45.5088, -73.554];
+
+      if(window.location.hash) {
+        var str = window.location.hash.substr(5).split("/");
+        zoomLevel = str[0];
+        coordinates = {lat:parseFloat(str[1]), 
+                        lng:parseFloat(str[2])};
+      }
+
+      function onMapMoveEnd(e) {
+          queryOverpass();
+          updateUrlLoc();
+          return true;
+      };
+
+      function makeMap() {
+        var layerOSM = L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+          maxNativeZoom:19,
+          maxZoom:25
+        });
+        var layerOpenTopo = L.tileLayer('http://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
+          maxNativeZoom:19,
+          maxZoom:25
+        });
+
+        climbingMap.map = L.map('map', {
+            layers: [layerOSM],
+            minZoom: 6,
+            maxZoom:24
+        }).setView(coordinates, zoomLevel);
+
+        climbingMap.markerClusterGroup = L.markerClusterGroup({
+            disableClusteringAtZoom: 18,
+            chunkedLoading: true
+        });
+        climbingMap.osmJson = {};
+
+        var map = climbingMap.map;
+        //map.on('viewreset', onMapViewReset);
+        map.on('moveend', onMapMoveEnd);
+
+        climbingMap.map.addLayer(climbingMap.markerClusterGroup);
+
+        queryOverpass();
+
+        L.control.scale().addTo(map);
+
+        var baseLayer = {
+            "OpenTopoMap": layerOpenTopo,
+            "OpenStreetMap": layerOSM
+        };
+      };
+
+      function formatBBox() {
+          var mapLatLngBounds = climbingMap.map.getBounds();
+          var bbString = "[bbox:" + mapLatLngBounds.getSouth() + "," + mapLatLngBounds.getWest() + "," + mapLatLngBounds.getNorth() + "," + mapLatLngBounds.getEast() + "]";
+          return bbString;
+      }
+
+      function queryOverpass() {
+          var bbString = formatBBox();
+          var overpassQuery = encodeURIComponent(bbString + "[out:json][out:json][timeout:60];(node[sport=climbing];);out center;>;");
+          var overpassURL = "https://overpass.kumi.systems/api/interpreter?data=" + overpassQuery;
+
+          $.ajax({
+              url: overpassURL,
+              type: 'GET',
+              crossDomain: true,
+              success: function (data) {
+                  climbingMap.osmJson = data.elements;
+                  makeMarkers();
+              }
+          });
+      };
+
+      function updateUrlLoc() {
+          var mapCenter = climbingMap.map.getCenter();
+          window.history.replaceState("", "Climb The World Online", "#map="+climbingMap.map.getZoom() + "/" + mapCenter.lat + "/" + mapCenter.lng);
+      }
+
+      function makeMarkers() {
+          var markerCG = climbingMap.markerClusterGroup;
+          markerCG.clearLayers();
+          climbingMap.osmJson.forEach(function (node) {
+            var marker;
+            var storkIcon = new L.icon({
+                iconUrl: "./res/img/ic_route.svg",
+                iconSize: [48, 48],
+                iconAnchor: [24, 48],
+                popupAnchor: new L.Point(0, -48)
+            });
+            marker = L.marker(new L.LatLng(node.lat, node.lon), {
+                icon: storkIcon
+            }).bindTooltip("5.10c",{
+                permanent: true,
+                offset: [24, -48]
+            }).openTooltip();
+            marker.bindPopup(formatMarkerInfo(node));
+            markerCG.addLayer(marker);
+          });
+      };
+
+      function formatMarkerInfo(node) {
+        var link = '<a href="https://www.openstreetmap.org/' + node.id +
+            '">Open in osm.org</a><br>';
+
+        var resultContent ="";
+
+        for (var key in node.tags) {
+            resultContent = resultContent + "<b>" + key + ":</b> " + node.tags[key] + "<br/>"; 
+        }
+
+        return resultContent;
+      };
+
+      makeMap();
+    </script>
+  </body>
+</html>
