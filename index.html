@@ -217,6 +217,8 @@
           zoomDialog.style.display = 'none';
         }
 
+        clusterSource.distance = getClusterDistance();
+
         if (element) {
           $(element).popover('destroy');
         }
@@ -262,9 +264,18 @@
       })
 
       var clusterSource = new ol.source.Cluster({
-        distance: 20,
         source: vectorSource
       });
+
+      function getClusterDistance() {
+        if (map.getView().getZoom() > 18) {
+          return 0;
+        } else {
+          return 20;
+        }
+      }
+
+      clusterSource.distance = getClusterDistance();
 
       var styleCache = {};
       var clusters = new ol.layer.Vector({
