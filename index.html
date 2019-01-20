@@ -96,7 +96,7 @@
                 anchor: [0.5, 1],
                 width: 6,
                 color: '#ffffffaa',
-                src: './res/img/ic_poi_gym.svg'
+                src: './res/img/ic_poi_artificial.svg'
               }))
           })],
           'route?': [new ol.style.Style({
@@ -104,7 +104,7 @@
                 anchor: [0.5, 1],
                 width: 6,
                 color: '#00ff00aa',
-                src: './res/img/ic_route.svg'
+                src: './res/img/ic_poi.svg'
               }))
           })],
           'undefined': [new ol.style.Style({
@@ -112,7 +112,7 @@
                 anchor: [0.5, 1],
                 width: 6,
                 color: '#ffffffaa',
-                src: './res/img/ic_route.svg'
+                src: './res/img/ic_poi.svg'
               }))
           })]
       };
@@ -147,7 +147,7 @@
                       anchor: [0.5, 1],
                       width: 6,
                       color: rgbToHex(HSVtoRGB(remapScale(0, uiaaGrades.length-1, 1, 0, uiaaGrades.indexOf(grade))*120, 1, 1)),
-                      src: './res/img/ic_route.svg'
+                      src: './res/img/ic_poi.svg'
                     })),
                     text: new ol.style.Text({
                       text: grade,
