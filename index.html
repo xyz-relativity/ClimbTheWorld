@@ -72,7 +72,6 @@
       var uiaaGrades = ["1-","1","1+","2-","2","2+","3-","3","3+","4-","4","4+","5-","5","5+","6-","6","6+","7-","7","7+","8-","8","8+","9-","9","9+","10-","10","10+","11-","11","11+","12+","12","12+","13-","13","13+","14-"];
 
       var zoomDialog = document.getElementById('zoomWorning');
-      zoomDialog.style.display = 'none';
       var zoomLevel = 13;
       var coordinates = ol.proj.fromLonLat([-73.554, 45.5088]);
 
@@ -80,6 +79,12 @@
         var str = window.location.hash.substr(5).split("/");
         zoomLevel = str[0];
         coordinates = ol.proj.fromLonLat([parseFloat(str[2]), parseFloat(str[1])]);
+      }
+      
+      if (zoomLevel < MAX_ZOOM_LEVEL) {
+          zoomDialog.style.display = 'block';
+      } else {
+          zoomDialog.style.display = 'none';
       }
 
       var styles = {
@@ -254,7 +259,13 @@
           });
         },
         strategy: ol.loadingstrategy.bbox
-        // strategy: ol.loadingstrategy.all 
+//         strategy: ol.loadingstrategy.all 
+//         strategy: function(extent, resolution) {
+//             if(map.getView().getZoom() < MAX_ZOOM_LEVEL){
+//                 this.loadedExtentsRtree_.clear();
+//             }
+//             return [extent];
+//         }
       });
 
       var vectorLayer = new ol.layer.Vector({
