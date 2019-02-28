@@ -173,6 +173,12 @@
       var contentFunction = function (feature) {
         var featureType = getFeatureType(feature);
         var resultContent ="";
+    
+        var coord = feature.getGeometry().getCoordinates();
+        coord = ol.proj.transform(coord, 'EPSG:3857', 'EPSG:4326');
+        var lon = coord[0];
+        var lat = coord[1];
+        
         var resultTitle = feature.get('name') + ' [' + featureType + '] ' + '<a target="_blank" href="https://www.openstreetmap.org/' + feature.get('id') + '">OSM link.</a>';
         if (feature.get('climbing:grade:uiaa')) {
           resultContent = resultContent + '<b>Uiaa grade:</b> ' + feature.get('climbing:grade:uiaa') + '<br/>';
@@ -182,16 +188,26 @@
         } else if (feature.get('website')) {
           resultContent = resultContent + '<b>Website:</b> <a target="blank" href="' + feature.get('website') + '">' + feature.get('website') +'</a><br/>'
         }
+        
+        resultContent = resultContent + '<hr/>';
+        resultContent = resultContent + '<b>External linkes</b>' + '<br/>';
+        
+        resultContent = resultContent + '<a target="_blank" href="https://www.openstreetmap.org/' + feature.get('id') + '#map=19/' + lat + '/' + lon + '">OSM link.</a>' + '<br/>';
+        resultContent = resultContent + '<a target="_blank" href="climbtheworld://map_view/location/' + lat + '/' + lon + '">Climb the World URL.</a>' + '<br/>';
+        resultContent = resultContent + '<a target="_blank" href="https://www.google.com/maps/place/' + lat + ',' + lon + '/@' + lat + ',' + lon + ',19z/data=!5m1!1e4">Google Maps link.</a>' + '<br/>';
+        resultContent = resultContent + '<a target="_blank" href="geo:' + lat + ',' + lon + ',0">Geo link URL.</a>' + '<br/>';
 
         resultContent = resultContent + '<hr/>';
+        
+        resultContent = resultContent + '<b>OSM tags</b>' + '<br/>';
 
         var keys = feature.getKeys();
         for (var i=0; i < keys.length; i++) {
           if (keys[i] !== 'geometry') {
-            resultContent = resultContent + '<b>' + keys[i] + '</b> ' + feature.get(keys[i]) + '<br/>';
+            resultContent = resultContent + '<b>' + keys[i] + ':</b> ' + feature.get(keys[i]) + '<br/>';
           }
         }
-
+        
         return {
           title: resultTitle,
           content: resultContent
