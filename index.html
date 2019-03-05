@@ -199,7 +199,7 @@
         var lon = coord[0];
         var lat = coord[1];
         
-        var resultTitle = feature.get('name') + ' [' + featureType + '] ' + '<a target="_blank" href="https://www.openstreetmap.org/' + feature.get('id') + '">OSM link.</a>';
+        var resultTitle = feature.get('name') + ' [' + featureType + '] ';
         if (feature.get('climbing:grade:uiaa')) {
           resultContent = resultContent + '<b>Uiaa grade:</b> ' + feature.get('climbing:grade:uiaa') + '<br/>';
         }
