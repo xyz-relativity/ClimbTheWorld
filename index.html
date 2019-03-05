@@ -45,6 +45,26 @@
         width: 100%;
         top: 0%;
       }
+      
+      #scrolltable { 
+        margin-top: 20px; 
+        height: 10em; 
+        overflow: auto; 
+      }
+      
+      #scrolltable table { 
+        border-collapse: collapse; 
+      }
+      
+      #scrolltable tr:nth-child(even) { 
+        background: #EEE; 
+      }
+      
+      #scrolltable th {
+        color:white; 
+        background-color:grey;
+      }
+
       </style>
   </head>
   <body>
@@ -197,11 +217,8 @@
         
         resultContent = resultContent + '<b>OSM tags</b>' + '<br/>';
         
-        resultContent = resultContent + '<table cellspacing="0" cellpadding="0" border="0">';
-        resultContent = resultContent + '<tr>';
-        resultContent = resultContent + '<td>';
-        resultContent = resultContent + '<div style="height:10em; max-width: 30em;; overflow:auto;">';
-        resultContent = resultContent + '<table cellspacing="0" cellpadding="1" border="1">';
+        resultContent = resultContent + '<div id="scrolltable">';
+        resultContent = resultContent + '<table>';
         resultContent = resultContent + '<tr style="color:white;background-color:grey">';
         resultContent = resultContent + '<th>Tag</th>';
         resultContent = resultContent + '<th>Value</th>';
@@ -225,9 +242,6 @@
         
         resultContent = resultContent + '</table>';
         resultContent = resultContent + '</div>';
-        resultContent = resultContent + '</td>';
-        resultContent = resultContent + '</tr>';
-        resultContent = resultContent + '</table>';
         
         return {
           title: resultTitle,
