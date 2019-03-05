@@ -183,30 +183,51 @@
         if (feature.get('climbing:grade:uiaa')) {
           resultContent = resultContent + '<b>Uiaa grade:</b> ' + feature.get('climbing:grade:uiaa') + '<br/>';
         }
-        if (feature.get('contact:website')) {
-          resultContent = resultContent + '<b>Contact website:</b> <a target="_blank" href="' + feature.get('contact:website') + '">' + feature.get('contact:website') +'</a><br/>';
-        } else if (feature.get('website')) {
-          resultContent = resultContent + '<b>Website:</b> <a target="blank" href="' + feature.get('website') + '">' + feature.get('website') +'</a><br/>'
-        }
         
         resultContent = resultContent + '<hr/>';
         resultContent = resultContent + '<b>External linkes</b>' + '<br/>';
-        
-        resultContent = resultContent + '<a target="_blank" href="https://www.openstreetmap.org/' + feature.get('id') + '#map=19/' + lat + '/' + lon + '">OSM link.</a>' + '<br/>';
-        resultContent = resultContent + '<a target="_blank" href="climbtheworld://map_view/location/' + lat + ',' + lon + '">Climb the World URL.</a>' + '<br/>';
-        resultContent = resultContent + '<a target="_blank" href="https://www.google.com/maps/place/' + lat + ',' + lon + '/@' + lat + ',' + lon + ',19z/data=!5m1!1e4">Google Maps link.</a>' + '<br/>';
-        resultContent = resultContent + '<a target="_blank" href="geo:' + lat + ',' + lon + ',0">Geo link URL.</a>' + '<br/>';
+        resultContent = resultContent + '<ul>';
+        resultContent = resultContent + '<li><a target="_blank" href="https://www.openstreetmap.org/' + feature.get('id') + '#map=19/' + lat + '/' + lon + '">OSM link.</a>' + '</li>';
+        resultContent = resultContent + '<li><a target="_blank" href="climbtheworld://map_view/location/' + lat + ',' + lon + '">Climb the World URL.</a>' + '</li>';
+        resultContent = resultContent + '<li><a target="_blank" href="https://www.google.com/maps/place/' + lat + ',' + lon + '/@' + lat + ',' + lon + ',19z/data=!5m1!1e4">Google Maps link.</a>' + '</li>';
+        resultContent = resultContent + '<li><a target="_blank" href="geo:' + lat + ',' + lon + ',0">Geo link URL.</a>' + '</li>';
+        resultContent = resultContent + '</ul>';
 
         resultContent = resultContent + '<hr/>';
         
         resultContent = resultContent + '<b>OSM tags</b>' + '<br/>';
+        
+        resultContent = resultContent + '<table cellspacing="0" cellpadding="0" border="0">';
+        resultContent = resultContent + '<tr>';
+        resultContent = resultContent + '<td>';
+        resultContent = resultContent + '<div style="height:10em; max-width: 30em;; overflow:auto;">';
+        resultContent = resultContent + '<table cellspacing="0" cellpadding="1" border="1">';
+        resultContent = resultContent + '<tr style="color:white;background-color:grey">';
+        resultContent = resultContent + '<th>Tag</th>';
+        resultContent = resultContent + '<th>Value</th>';
+        resultContent = resultContent + '</tr>';
 
         var keys = feature.getKeys();
         for (var i=0; i < keys.length; i++) {
           if (keys[i] !== 'geometry') {
-            resultContent = resultContent + '<b>' + keys[i] + ':</b> ' + feature.get(keys[i]) + '<br/>';
+            resultContent = resultContent + '<tr>';
+            
+            var value = feature.get(keys[i]);
+            
+            if ((keys[i]  === 'contact:website') || (keys[i] === 'website')) {
+                value = '<a target="blank" href="' + value + '">' + value +'</a><br/>'
+            }
+            
+            resultContent = resultContent + '<td><b>' + keys[i] + '</b></td><td>' + value + '</td>';
+            resultContent = resultContent + '</tr>';
           }
         }
+        
+        resultContent = resultContent + '</table>';
+        resultContent = resultContent + '</div>';
+        resultContent = resultContent + '</td>';
+        resultContent = resultContent + '</tr>';
+        resultContent = resultContent + '</table>';
         
         return {
           title: resultTitle,
