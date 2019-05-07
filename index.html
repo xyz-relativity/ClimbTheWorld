@@ -103,6 +103,8 @@
     </div>
 
     <script>
+    
+      var MAP_CENTER = ol.proj.fromLonLat([-73.554, 45.5088]);
       var MAX_ZOOM_LEVEL = 10;
       var DEFAULT_ZOOM_LEVEL = 13;
       var CLUSTER_ZOOM_LEVEL = 17;
@@ -110,7 +112,9 @@
 
       var zoomDialog = document.getElementById('zoomWorning');
       var zoomLevel = DEFAULT_ZOOM_LEVEL;
-      var coordinates = ol.proj.fromLonLat([-73.554, 45.5088]);
+      var coordinates = MAP_CENTER;
+      
+      var onInit = true;
 
       if(window.location.hash) {
         var str = window.location.hash.substr(5).split("/");
@@ -277,9 +281,12 @@
         ],
         target: 'map',
         view: new ol.View({
-          center: coordinates,
-          zoom: zoomLevel
-        })
+          center: MAP_CENTER,
+          zoom: DEFAULT_ZOOM_LEVEL,
+        }),
+        loadTilesWhileAnimating: true,
+        loadTilesWhileInteracting: true,
+        moveTolerance: 3
       });
       
       map.getView().on('change:resolution', function(evt){
@@ -335,7 +342,7 @@
 //             return [extent];
 //         }
       });
-
+      
       var vectorLayer = new ol.layer.Vector({
         renderMode: 'image',
         source: vectorSource,
@@ -445,10 +452,27 @@
       });
 
       map.on('moveend', function(evt) {
-        var coord = ol.proj.toLonLat(map.getView().getCenter());
-        window.history.replaceState("", "Climb The World Online", "#map="+map.getView().getZoom() + "/" + coord[1] + "/" + coord[0]);
+        console.log("resetUrl" + onInit);
+        if (!onInit) {
+            var coord = ol.proj.toLonLat(map.getView().getCenter());
+            window.history.replaceState("", "Climb The World Online", "#map="+map.getView().getZoom() + "/" + coord[1] + "/" + coord[0]);
+        }
       });
-
+      
+      if(window.location.hash) {
+        console.log("timer on");
+        var str = window.location.hash.substr(5).split("/");
+        zoomLevel = str[0];
+        coordinates = ol.proj.fromLonLat([parseFloat(str[2]), parseFloat(str[1])]);
+        
+        console.log(zoomLevel);
+          
+        map.getView().animate({
+        center: coordinates,
+        zoom: zoomLevel
+        });
+      }
+      
     </script>
 
     <script>
