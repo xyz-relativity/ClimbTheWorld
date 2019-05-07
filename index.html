@@ -106,6 +106,7 @@
     
       var MAP_CENTER = ol.proj.fromLonLat([-73.554, 45.5088]);
       var MAX_ZOOM_LEVEL = 10;
+      var REZOLUTION_LAYER_FLIP= 1;
       var DEFAULT_ZOOM_LEVEL = 13;
       var CLUSTER_ZOOM_LEVEL = 17;
       var uiaaGrades = ["1-","1","1+","2-","2","2+","3-","3","3+","4-","4","4+","5-","5","5+","6-","6","6+","7-","7","7+","8-","8","8+","9-","9","9+","10-","10","10+","11-","11","11+","12+","12","12+","13-","13","13+","14-"];
@@ -276,7 +277,12 @@
             // source: new ol.source.OSM()
             source: new ol.source.XYZ({
               url: 'https://{a-c}.tile.opentopomap.org/{z}/{x}/{y}.png'
-            })
+            }),
+            minResolution: REZOLUTION_LAYER_FLIP,
+          }),
+          new ol.layer.Tile({
+            source: new ol.source.OSM(),
+            maxResolution: REZOLUTION_LAYER_FLIP
           })
         ],
         target: 'map',
@@ -452,20 +458,14 @@
       });
 
       map.on('moveend', function(evt) {
-        console.log("resetUrl" + onInit);
-        if (!onInit) {
-            var coord = ol.proj.toLonLat(map.getView().getCenter());
-            window.history.replaceState("", "Climb The World Online", "#map="+map.getView().getZoom() + "/" + coord[1] + "/" + coord[0]);
-        }
+        var coord = ol.proj.toLonLat(map.getView().getCenter());
+        window.history.replaceState("", "Climb The World Online", "#map="+map.getView().getZoom() + "/" + coord[1] + "/" + coord[0]);
       });
       
       if(window.location.hash) {
-        console.log("timer on");
         var str = window.location.hash.substr(5).split("/");
         zoomLevel = str[0];
         coordinates = ol.proj.fromLonLat([parseFloat(str[2]), parseFloat(str[1])]);
-        
-        console.log(zoomLevel);
           
         map.getView().animate({
         center: coordinates,
