@@ -278,11 +278,7 @@
             source: new ol.source.XYZ({
               url: 'https://{a-c}.tile.opentopomap.org/{z}/{x}/{y}.png'
             }),
-            minResolution: REZOLUTION_LAYER_FLIP,
-          }),
-          new ol.layer.Tile({
-            source: new ol.source.OSM(),
-            maxResolution: REZOLUTION_LAYER_FLIP
+            preload: 17
           })
         ],
         target: 'map',
