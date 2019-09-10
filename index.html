@@ -317,7 +317,7 @@
           var stringExtent = epsg4326Extent[1] + ',' + epsg4326Extent[0] + ',' +
               epsg4326Extent[3] + ',' + epsg4326Extent[2];
 
-          var query = '[bbox:'+ stringExtent + '][out:json][timeout:60];(node["sport"="climbing"];);out center;>;'
+          var query = '[bbox:'+ stringExtent + '][out:json][timeout:60];(node["sport"~"\W*(climbing)\W*"];);out center;>;'
           fetch('https://overpass.kumi.systems/api/interpreter', {
             method: "POST",
             body: query
