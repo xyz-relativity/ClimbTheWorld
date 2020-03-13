@@ -102,7 +102,7 @@
           if (!markers[element.id]) {
             var style = styles[getFeatureType(element)];
             markers[element.id] = WE.marker([element.lat, element.lon], style.src, 30, 46).addTo(earth);
-            markers[element.id].bindPopup(createPopup(element).content, {maxWidth: 250, closeButton: true});
+            markers[element.id].bindPopup(createPopup(element).content, {maxWidth: 300, closeButton: true});
           }
         }
       }
@@ -129,6 +129,9 @@
         var lat = feature.lat;
         
         var resultTitle = feature.tags.name + ' [' + featureType + '] ';
+        if (feature.tags.name) {
+          resultContent = resultContent + '<b>Name:</b> ' + feature.tags.name + '<br/>';
+        }
         if (feature.tags['climbing:grade:uiaa']) {
           resultContent = resultContent + '<b>Uiaa grade:</b> ' + feature.tags['climbing:grade:uiaa'] + '<br/>';
         }
