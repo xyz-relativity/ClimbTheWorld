@@ -111,7 +111,7 @@
         console.log(feature);
         if (feature.tags.climbing === 'crag') {
           return 'crag';
-        } else if(feature.tags.leisure === 'sports_centre' || feature.tags.tower === 'climbing') {
+        } else if(feature.tags.leisure === 'sports_centre' || feature.tags['tower:type'] === 'climbing') {
           return 'gym';
         } else if (feature.tags.climbing === 'route_bottom' || feature.tags.climbing === 'route_top') {
           return 'route?';
