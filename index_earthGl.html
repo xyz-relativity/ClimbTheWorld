@@ -1,0 +1,99 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <script src="http://www.webglearth.com/v2/api.js"></script>
+    <script>
+
+      var MAP_CENTER = [45.5088, -73.554];
+      var MAX_ZOOM_LEVEL = 9;
+      var REZOLUTION_LAYER_FLIP= 1;
+      var DEFAULT_ZOOM_LEVEL = 13;
+      var CLUSTER_ZOOM_LEVEL = 17;
+      var uiaaGrades = ["1-","1","1+","2-","2","2+","3-","3","3+","4-","4","4+","5-","5","5+","6-","6","6+","7-","7","7+","8-","8","8+","9-","9","9+","10-","10","10+","11-","11","11+","12+","12","12+","13-","13","13+","14-"];
+      var earth;
+      var markers = {};
+      var intervalID;
+
+      function initialize() {
+        var options = { sky: true};
+        earth = new WE.map('earth_div', options);
+
+        earth.setView(MAP_CENTER, DEFAULT_ZOOM_LEVEL)
+
+        WE.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',{
+          attribution: '© OpenStreetMap contributors'
+        }).addTo(earth);
+        
+        var showInfo = function(e) {
+            if (earth.getBounds() != bounds) {
+                bounds = earth.getBounds();
+
+                if (earth.getZoom() >= MAX_ZOOM_LEVEL) {
+                  delayGetData(bounds);
+                }
+            }
+        }
+        earth.on('wheel', showInfo);
+        earth.on('click', showInfo);
+        
+        var bounds = earth.getBounds()
+        delayGetData(bounds);
+      }
+
+      function delayGetData(bounds) {
+        if (intervalID) {
+          clearTimeout(intervalID);
+        }
+        var intervalID = setTimeout(getData, 2000, bounds);
+      }
+
+      function getData(bounds) {
+        var stringExtent = bounds[0] + ',' + bounds[2] + ',' + bounds[1] + ',' + bounds[3];
+
+        var query = '[bbox:'+ stringExtent + '][out:json][timeout:60];(node["sport"~"\W*(climbing)\W*"];);out center;>;';
+
+        fetch('https://www.overpass-api.de/api/interpreter', {
+          method: 'POST',
+          body: query,
+          headers:{
+            'Content-Type': 'application/json'
+          }
+        }).then(
+            function(response) {
+              if (response.status !== 200) {
+                console.log('Looks like there was a problem. Status Code: ' +
+                  response.status);
+                return;
+              }
+
+              // Examine the text in the response
+              response.json().then(function(data) {
+                createMarkers(data);
+              });
+            }
+          )
+          .catch(function(err) {
+            console.log('Fetch Error :-S', err);
+          });
+      }
+
+      function createMarkers(response) {
+        for (var i = 0; i < response.elements.length; i++) {
+          var element = response.elements[i];
+          console.log(response.elements[i]);
+          if (!markers[element.id]) {
+            markers[element.id] = WE.marker([element.lat, element.lon]).addTo(earth);
+          }
+        }
+      }
+    </script>
+    <style>
+      html, body{padding: 0; margin: 0;}
+      #earth_div{top: 0; right: 0; bottom: 0; left: 0; position: absolute !important;}
+    </style>
+    <title>WebGL Earth API: Hello World</title>
+  </head>
+  <body onload="initialize()">
+    <div id="earth_div"></div>
+  </body>
+</html>
