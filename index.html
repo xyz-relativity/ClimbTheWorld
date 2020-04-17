@@ -318,7 +318,7 @@
           var stringExtent = epsg4326Extent[1] + ',' + epsg4326Extent[0] + ',' +
               epsg4326Extent[3] + ',' + epsg4326Extent[2];
 
-          var query = '[bbox:'+ stringExtent + '][out:json][timeout:60];(node["sport"~"\W*(climbing)\W*"];);out center;>;'
+          var query = '[bbox:'+ stringExtent + '][out:json][timeout:60];(node["sport"~"\W*(climbing)\W*"];way["sport"~"\W*(climbing)\W*"];relation["sport"~"\W*(climbing)\W*"];);out center;>;'
           fetch('https://overpass-api.de/api/interpreter', {
             method: "POST",
             body: query
